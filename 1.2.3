@@ -1,0 +1,23 @@
+// Name: main.c
+// Author: Steyn L Knollema
+// Copyright: TBH i don't care if you copy it
+// License:
+
+#include "MEAM_general.h" // includes the resources included in the MEAM_general.h file
+
+int main(void)
+{
+    DDRB |= (1 << PB1);
+
+    while (1) {
+        // turn on the LED by setting PB1 High
+        PORTB |= (1 << PB1);
+        _delay_ms(500); // wait for 500ms
+
+        // Turn off the LED by setting PB1 low
+        PORTB &= ~(1 << PB1);
+        _delay_ms(500); // wait for the 500ms
+    }
+
+    return 0; // never reached
+}
