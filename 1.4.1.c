@@ -12,7 +12,7 @@ int main(void)
 {
     _clockdivide(0); // set the clock speed to 16 Mhz
     set(DDRC, PC6);  // Set PB5 as output
-    int TOPvalue = 10000;
+    int TOPvalue = 10000; // sets variable to TOP value to make LED pulse 250Khz/10000 = 23.9 Hz.
 
     // Timer/Counter control register setup for PWM on Timer 3
     set(TCCR3A, COM3A1);// Set Timer 3 to non-inverting mode for OC3A (clears output on compare match, sets at BOTTOM)
