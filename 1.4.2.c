@@ -44,19 +44,19 @@ void pulse(int top, float max_intensity, float increasetime, float decreasetime)
 
     // Gradually increase brightness
     for (i = 0; i <= 100; i++) {
-        OCR3A = (int)(i / 100.0 * top);  // Set duty cycle
-        _delay_ms(increasetime / 100);   // Delay for smooth brightness increase
+        OCR3A = (int)(i / 100.0 * top);// Set duty cycle
+        _delay_ms(increasetime / 100);// Delay for smooth brightness increase
     }
 
     // Gradually decrease brightness
     for (i = 100; i >= 0; i--) {
-        OCR3A = (int)(i / 100.0 * top);  // Set duty cycle
-        _delay_ms(decreasetime / 100);   // Delay for smooth brightness decrease
+        OCR3A = (int)(i / 100.0 * top);// Set duty cycle
+        _delay_ms(decreasetime / 100);// Delay for smooth brightness decrease
     }
 }
     //function for heartbeat pattern
     void heartbeat(int top) {
-        pulse(top, 100, 100, 400); // fade in 100% in 100ms, fade out in 400ms
+        pulse(top, 100, 100, 400);// fade in 100% in 100ms, fade out in 400ms
         _delay_ms(100); //delay 100ms before second pulse
         pulse(top, 50, 100, 400);//fade in 50% in 100ms, fade out in 400ms
         _delay_ms(2000); // wait 2000 ms for next signal
