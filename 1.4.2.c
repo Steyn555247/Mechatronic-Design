@@ -6,7 +6,7 @@
 #include "MEAM_general.h"  // General utility macros
 
  // Function prototype for pulse
-void pulse(int top, float max_intensity, float increasetime, float decreasetime);
+void pulsefunction(int top, float max_intensity, float increasetime, float decreasetime);
 // function for heartbeat pattern
 void heartbeat(int top);
 
@@ -14,7 +14,7 @@ int main(void)
 {
     _clockdivide(0); // set the clock speed to 16 Mhz
     set(DDRC, PC6);  // Set PB5 as output
-    int TOPvalue = 10000;
+    int TOPvalue = 10000; // sets variable to TOP value to make LED pulse 250Khz/10000 = 23.9 Hz which is low, but it worked.
 
     // Timer/Counter control register setup for PWM on Timer 3
     set(TCCR3A, COM3A1);// Set Timer 3 to non-inverting mode for OC3A (clears output on compare match, sets at BOTTOM)
@@ -38,8 +38,8 @@ int main(void)
     return 0;  // End of main
 }
 
-// Function to control the LED pulse with a duty cycle increase and decrease
-void pulse(int top, float max_intensity, float increase, float decrease) {
+// Function to control the LED pulse with a duty cycle increase and decrease. I call this pulse function in the heartbeat which allows me to fade in/out the pulse
+void pulsefunction(int top, float max_intensity, float increase, float decrease) {
     float i;
 
     // Gradually increase brightness
@@ -56,9 +56,9 @@ void pulse(int top, float max_intensity, float increase, float decrease) {
 }
     //function for heartbeat pattern
     void heartbeat(int top) {
-        pulse(top, 100, 100, 400);// fade in 100% in 100ms, fade out in 400ms
+        pulsefunction(top, 100, 100, 400);// fade in 100% in 100ms, fade out in 400ms
         _delay_ms(100); //delay 100ms before second pulse
-        pulse(top, 50, 100, 400);//fade in 50% in 100ms, fade out in 400ms
+        pulsefunction(top, 50, 100, 400);//fade in 50% in 100ms, fade out in 400ms
         _delay_ms(2000); // wait 2000 ms for next signal
         
 
