@@ -1,68 +1,104 @@
 /* Name: main.c
- * Author: Steyn L Knollema
- * Copyright: I got it from ChatGPT so you can get it from me. (yeah that rhymes)
- * License: 
+ * Author: Steyn Knollema
+ * Description: Heartbeat that slowly fades out
+ * Copyright: I dont care if you copy it
  */
+
 #include "MEAM_general.h"  // General utility macros
 
- // Function prototype for pulse
-void pulse(int top, float max_intensity, float increasetime, float decreasetime);
-// function for heartbeat pattern
-void heartbeat(int top, float max_intensity);
+ //Constants that are being used throughout the code, allows for centralized change of code
+#define TOP_VALUE 10000// Set the TOP value for the 3rd Timer PMW
+#define STEPS 100// Set 100 steps for slowly fading the Heartbeat
+#define HEARTBEAT_PERIOD 3000// Set the total period of the heartbeat in MS
+#define NUM_BEATS 20// fade out Heartrate in 20 beats.
+#define INITIAL_INTENSITY 100 // Starting intensity percentage (0-100%) and slowly decrease this intesnity
+
+// set the functions
+void pulse(int max_intensity, int increasetime_ms, int decreasetime_ms);
+void heartbeat(int max_intensity);
+void fade_intensity(void);
 
 int main(void)
 {
-    _clockdivide(0); // set the clock speed to 16 Mhz
-    set(DDRC, PC6);  // Set PB5 as output
-    int TOP = 10000;
-    float max_intensity = 100.0;//start with high intesnity
-    int beats = 20; //number of heartbeats before fully away
+//Set clock and PC6
+    _clockdivide(0);// Set the clock speed to 16 MHz
+    set(DDRC, PC6);// Set PC6 to an output since the LED is connected to PC6
 
-    // Timer/Counter control register setup for PWM on Timer 3
-    set(TCCR3A, COM3A1);// Set Timer 3 to non-inverting mode for OC3A (clears output on compare match, sets at BOTTOM)
-    clear(TCCR3A, COM3A0);// Ensure COM3A0 is cleared to fully enable non-inverting mode on OC3A
+// Setup the Timer/control register for the PWM on Timer 3 (which is on PC6)
+    set(TCCR3A, COM3A1);// Non-inverting mode for OC3A so the output starts high
+    clear(TCCR3A, COM3A0);// Ensure COM3A0 is cleared
 
-    set(TCCR3A, WGM31);// Set WGM31 (Waveform Generation Mode) for Fast PWM
-    set(TCCR3B, WGM32);// Set WGM32 for Fast PWM mode with ICR3 as the TOP value
-    set(TCCR3B, WGM33);// Set WGM33 for Fast PWM mode (along with WGM31, WGM32)
+    set(TCCR3A, WGM31);// set the Waveform Geneartion mode on fast PWM mode
+    set(TCCR3B, WGM32);// set the waveform generation mode on fast PWM  
+    set(TCCR3B, WGM33);// set waveform generation mode on fast PWM with ICR3 as top
 
-    set(TCCR3B, CS30);// Set Timer 3 prescaler to 64 by setting CS30 and CS31 (clock select bits)
-    set(TCCR3B, CS31);// This sets the clock prescaler to 64, allowing a slower PWM frequency
+ // Set prescaler to 1 for maximum PWM frequency to prevent flicker (I had this problem with my earlier code that it would flicker) (see 1.4.2) but changed that for this final code
+    set(TCCR3B, CS30); // turns on bit CS30
+    clear(TCCR3B, CS31); // Turns of bit CS31
+    clear(TCCR3B, CS32); // Turns off CS32 thus making sure the timer runs at full clock speed
 
-    ICR3 = TOP;  // Set TOP value for Timer 3
 
-    // Infinite loop to keep pulsing the LED
-    while (beats > 0 && max_intensity > 0) {
-        heartbeat(TOP, max_intensity);
-        max_intensity -= (100.0/20.0);//gradually decrease heartbeat by 1/20th part
-        beats--; // decrease counts of beats.
-        _delay_ms(2000);
+    ICR3 = TOP_VALUE;// Set TOP value for Timer 3 PWM
+
+    int max_intensity = INITIAL_INTENSITY;//Start with making max_intensity the initial intensity. through this i can operate it centralized
+    int intensity_step = INITIAL_INTENSITY / NUM_BEATS;// Intensity decrement per beat (in this case max/20)
+    int beats_remaining = NUM_BEATS;// Beats counter
+
+    // Main loop to produce the heartbeat effect
+    while (beats_remaining > 0) { // keep looping as long as the remaining beats are more than 0
+        heartbeat(max_intensity);// Execute the heartbeat function with current max intensity
+
+        max_intensity -= intensity_step;//lower the intensity for the next beat
+        beats_remaining--;//decrease beats counter
+        // Delay to maintain constant heartbeat period
+        _delay_ms(HEARTBEAT_PERIOD - 1000);// the entire heartbeat function duration is 1000 ms
     }
+
+    // After 20 beats, ensure the LED is turned off
+    OCR3A = 0;// Set duty cycle to 0 (LED off) to make sure the LED is really off
 
     return 0;  // End of main
 }
 
-// Function to control the LED pulse with a duty cycle increase and decrease
-void pulse(int top, float max_intensity, float increasetime, float decreasetime) {
-    float i;
+// Function to control the LED pulse with variable intensities and durations
+void pulse(int max_intensity, int increasetime_ms, int decreasetime_ms) {
+    int i; // set variable i that will be used in for loop
+    int duty_cycle; // set the inensity level of the LED as it pulses
+    int steps = STEPS; // the maount of steps being used to gradually decrease the LED
+    int delay_increase = increasetime_ms / steps; // the wait time to wait between every step when increasing hte LED intensity
+    int delay_decrease = decreasetime_ms / steps;// the wait time to wait between every stap when decreasing this intensity
 
     // Gradually increase brightness
-    for (i = 0; i <= max_intensity; i++) {
-        OCR3A = (int)(i / 100.0 * top);  // Set duty cycle
-        _delay_ms(increasetime / max_intensity);   // Delay for smooth brightness increase
+    for (i = 0; i <= steps; i++) {
+        // Calculate the current intensity
+        int current_intensity = (i * max_intensity) / steps;
+
+        // Convert intensity percentage to duty cycle value
+        duty_cycle = (current_intensity * TOP_VALUE) / 100;
+        OCR3A = duty_cycle;  // Set duty cycle
+
+        _delay_ms(delay_increase);  // Delay for smooth brightness increase
     }
 
     // Gradually decrease brightness
-    for (i = max_intensity; i >= 0; i--) {
-        OCR3A = (int)(i / 100.0 * top);  // Set duty cycle
-        _delay_ms(decreasetime / max_intensity);   // Delay for smooth brightness decrease
+    for (i = steps; i >= 0; i--) { // for loop to decrease the brightness of the LED
+        // Calculate the current intensity
+        int current_intensity = (i * max_intensity) / steps;// current_intensity is used to create a linear scale to scale the LED
+
+        // Convert intensity percentage to duty cycle value
+        duty_cycle = (current_intensity * TOP_VALUE) / 100; // use Curent cycle and top value to create Dutycycle. for decresaing LED
+        OCR3A = duty_cycle;// Set duty cycle
+
+        _delay_ms(delay_decrease);// Delay for smooth brightness decrease
     }
 }
-    //function for heartbeat pattern
-    void heartbeat(int top, float max_intensity) {
-        pulse(top, max_intensity, 100, 400); // fade in max intensity in 100ms, fade out in 400ms
-        _delay_ms(100); //delay 100ms before second pulse
-        pulse(top, max_intensity/2, 100, 400);//fade in 50% of max intensity in 100ms, fade out in 400ms
-        
-    }
 
+// Function for heartbeat pattern with variable maximum intensity
+void heartbeat(int max_intensity) {
+    // First pulse: Increase to max_intensity over 100 ms, then decrease to 0% over 400 ms
+    pulse(max_intensity, 100, 400);//First hard pulse
+    // Short pause between pulses
+    _delay_ms(100);// Delay of 100 ms
+    // Second pulse: Increase to half of max_intensity over 100 ms, then decrease to 0% over 400 ms
+    pulse(max_intensity / 2, 100, 400);  // Second "dub" pulse
+}
