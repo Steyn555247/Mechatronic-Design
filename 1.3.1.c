@@ -12,7 +12,7 @@ int main(void)
 {
 	_clockdivide(0); // sets the speed of the clock to 16Mhz
 	set(DDRB, 1); // DDRB = Ox02;, sets the DDRB register to output
-	TCCR3B = 0x03; //Scales down timer to 62.5khz (0000 0011)
+	TCCR3B = 0x03; //Scales down timer to 250KHz (0000 0011)
 
 	for(;;){ //start infinite for loop
 		if (TCNT3>MaxTime) // if the time of timer is higher than MaxTime
