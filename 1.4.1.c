@@ -6,13 +6,13 @@
 #include "MEAM_general.h"  // General utility macros
 
  // Function prototype for pulse
-void pulse(int top, float increasetime, float decreasetime);
+void pulse(int top, float increase, float decrease);
 
 int main(void)
 {
     _clockdivide(0); // set the clock speed to 16 Mhz
     set(DDRC, PC6);  // Set PB5 as output
-    int TOP = 10000;
+    int TOPvalue = 10000;
 
     // Timer/Counter control register setup for PWM on Timer 3
     set(TCCR3A, COM3A1);// Set Timer 3 to non-inverting mode for OC3A (clears output on compare match, sets at BOTTOM)
@@ -25,11 +25,11 @@ int main(void)
     set(TCCR3B, CS30);// Set Timer 3 prescaler to 64 by setting CS30 and CS31 (clock select bits)
     set(TCCR3B, CS31);// This sets the clock prescaler to 64, allowing a slower PWM frequency
 
-    ICR3 = TOP;  // Set TOP value for Timer 3
+    ICR3 = TOPvalue;  // Set TOP value for Timer 3
 
     // Infinite loop to keep pulsing the LED
     while (1) {
-        pulse(TOP, 500, 500);  // Pulse with increase and decrease time 500ms
+        pulsefunc(TOPvalue, 500, 500);  // Pulse with increase and decrease time 500ms
         _delay_ms(500); // LED is off for 500ms
     }
 
@@ -37,18 +37,18 @@ int main(void)
 }
 
 // Function to control the LED pulse with a duty cycle increase and decrease
-void pulse(int top, float increasetime, float decreasetime) {
+void pulsefunc(int top, float increase, float decrease) {
     float i;
 
     // Gradually increase brightness
     for (i = 0; i <= 100; i++) {
         OCR3A = (int)(i / 100.0 * top);  // Set duty cycle
-        _delay_ms(increasetime / 100);   // Delay for smooth brightness increase in this case 500ms/100
+        _delay_ms(increase / 100);   // Delay for smooth brightness increase in this case 500ms/100
     }
 
     // Gradually decrease brightness
     for (i = 100; i >= 0; i--) {
         OCR3A = (int)(i / 100.0 * top);// Set specific duty cycle
-        _delay_ms(decreasetime / 100); // Delay for smooth brightness decrease in this case 500ms/100
+        _delay_ms(decrease / 100); // Delay for smooth brightness decrease in this case 500ms/100
     }
 }
