@@ -1,6 +1,6 @@
 /* Name: main.c
  * Author: Steyn L Knollema
- * Copyright: I got it from ChatGPT so you can get it from me. (yeah that rhymes)
+ * Copyright:  TBH i don't care if you copy it
  * License: 
  */
 #include "MEAM_general.h"  // General utility macros
@@ -43,12 +43,12 @@ void pulse(int top, float increasetime, float decreasetime) {
     // Gradually increase brightness
     for (i = 0; i <= 100; i++) {
         OCR3A = (int)(i / 100.0 * top);  // Set duty cycle
-        _delay_ms(increasetime / 100);   // Delay for smooth brightness increase
+        _delay_ms(increasetime / 100);   // Delay for smooth brightness increase in this case 500ms/100
     }
 
     // Gradually decrease brightness
     for (i = 100; i >= 0; i--) {
-        OCR3A = (int)(i / 100.0 * top);  // Set duty cycle
-        _delay_ms(decreasetime / 100);   // Delay for smooth brightness decrease
+        OCR3A = (int)(i / 100.0 * top);// Set specific duty cycle
+        _delay_ms(decreasetime / 100); // Delay for smooth brightness decrease in this case 500ms/100
     }
 }
