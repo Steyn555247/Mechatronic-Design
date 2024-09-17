@@ -5,7 +5,7 @@
  */
 
 #include "MEAM_general.h"  // includes the resources included in the MEAM_general.h file
-#define Maxtime 6250
+#define Maxtime 6250 // to get 20Hz (using prescaler to 250 kHz). 250kHz * 0.05 sec = 12.500 counts. Since use of toggle 12.500/2 = 6250
 
 
 int main(void)
