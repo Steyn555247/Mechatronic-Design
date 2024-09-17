@@ -1,6 +1,6 @@
 /* Name: main.c
  * Author: Steyn L Knollema
- * Copyright: I got it from ChatGPT so you can get it from me. (yeah that rhymes)
+ * Copyright:  TBH i don't care if you copy it
  * License: 
  */
 
