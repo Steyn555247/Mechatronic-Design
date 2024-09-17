@@ -17,15 +17,13 @@ int main(void)
     // Timer/Counter control register setup for PWM on Timer 3
     set(TCCR3A, COM3A1);// Set Timer 3 to non-inverting mode for OC3A (clears output on compare match, sets at BOTTOM)
     clear(TCCR3A, COM3A0);// Ensure COM3A0 is cleared to fully enable non-inverting mode on OC3A
-
-    set(TCCR3A, WGM31);//
-    set(TCCR3B, WGM32);// 
-    set(TCCR3B, WGM33);//
-
+    set(TCCR3A, WGM31);// Set WGM31 (Waveform Generation Mode) for Fast PWM
+    set(TCCR3B, WGM32);// Set WGM32 for Fast PWM mode with ICR3 as the TOP value
+    set(TCCR3B, WGM33);// Set WGM33 for Fast PWM mode (along with WGM31, WGM32)
     set(TCCR3B, CS30);// Set Timer 3 prescaler to 64 by setting CS30 and CS31 (clock select bits)
     set(TCCR3B, CS31);// This sets the clock prescaler to 64, allowing a slower PWM frequency
 
-    ICR3 = TOPvalue;  // Set TOP value for Timer 3
+    ICR3 = TOPvalue;  // Set TOP value for ICR3 to variable TOP (which is 10000)
 
     // Infinite loop to keep pulsing the LED
     while (1) {
@@ -33,7 +31,7 @@ int main(void)
         _delay_ms(500); // LED is off for 500ms
     }
 
-    return 0;  // End of main
+    return 0;  // will never reach it
 }
 
 // Function to control the LED pulse with a duty cycle increase and decrease
