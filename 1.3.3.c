@@ -14,7 +14,7 @@ int main(void)
 	set(TCCR3B, WGM33);//sets WGM33 in TCCR3B to high (1000)
 	set(TCCR3B, WGM32);//Sets WGM32 in TCCR3B to high (0100)
 	set(TCCR3A, WGM31);//Sets WGM31 in TCCR3A to high (0010) in total sets TCCR in 1110 ->  Upto ICR3, PWM mode
-	clear(TCCR3A, WGM30);//to be sure clears WGM30
+	clear(TCCR3A, WGM30);//to be sure clears WGM30 (so total is (1110))
 	set(TCCR3A, COM3A1);//sets output compare to non-inverting mode
 	
 	set(TCCR3B, CS31); // prescaler to 250khz (0000 0100) -> prescaler of 64
