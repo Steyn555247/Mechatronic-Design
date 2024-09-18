@@ -1,18 +1,20 @@
 /* Name: main.c
  * Author: Steyn L Knollema
  * Copyright:  TBH i don't care if you copy it
- * License: 
+ * License:
  */
 #include "MEAM_general.h"  // General utility macros
 
  // Function prototype for pulse
-void pulse(int top, float increase, float decrease);
+void pulsefunc(int top, float increase, float decrease);
 
 int main(void)
 {
     _clockdivide(0); // set the clock speed to 16 Mhz
-    set(DDRC, PC6);  // Set PB5 as output
+    set(DDRC, PC6);  // Set PC6 as output
     int TOPvalue = 10000; // sets variable to TOP value to make LED pulse 250Khz/10000 = 23.9 Hz which is low, but it worked.
+    int inctime = 300; // variable to set increase time
+    int dectime = 600; // variable to set decrease time
 
     // Timer/Counter control register setup for PWM on Timer 3
     set(TCCR3A, COM3A1);// Set Timer 3 to non-inverting mode for OC3A (clears output on compare match, sets at BOTTOM)
@@ -27,7 +29,7 @@ int main(void)
 
     // Infinite loop to keep pulsing the LED
     while (1) {
-        pulsefunc(TOPvalue, 500, 500);  // Pulse with increase and decrease time 500ms
+        pulsefunc(TOPvalue, inctime, dectime);  // Pulse with increase and decrease time 500ms
         _delay_ms(500); // LED is off for 500ms
     }
 
@@ -49,4 +51,5 @@ void pulsefunc(int top, float increase, float decrease) {
         OCR3A = (int)(i / 100.0 * top);// Set specific duty cycle
         _delay_ms(decrease / 100); // Delay for smooth brightness decrease in this case 500ms/100
     }
+}
 }
