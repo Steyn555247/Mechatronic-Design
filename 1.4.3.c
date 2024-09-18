@@ -7,24 +7,24 @@
 #include "MEAM_general.h"  // General utility macros
 
  //Constants that are being used throughout the code, allows for centralized change of code
-#define TOP_VALUE 10000// Set the TOP value for the 3rd Timer PMW
+#define TOPvalue 10000// Set the TOP value for the 3rd Timer PMW
 #define STEPS 100// Set 100 steps for slowly fading the Heartbeat
 #define HEARTBEAT_PERIOD 3000// Set the total period of the heartbeat in MS (3000ms -> 3 seconds)
 #define NUM_BEATS 20// fade out Heartrate in 20 beats.
 #define INITIAL_INTENSITY 100 // Starting intensity percentage (0-100%) and slowly decrease this intesnity
 
 // set the functions
-void pulsefunction(int max_intensity, int increase_ms, int decrease_ms);
+void pulsefunc(int max_intensity, int increase_ms, int decrease_ms);
 void heartbeat(int max_intensity);
 void fade_intensity(void);
 
 int main(void)
 {
-//Set clock and PC6
+    //Set clock and PC6
     _clockdivide(0);// Set the clock speed to 16 MHz
     set(DDRC, PC6);// Set PC6 to an output since the LED is connected to PC6
 
-// Setup the Timer/control register for the PWM on Timer 3 (which is on PC6)
+    // Setup the Timer/control register for the PWM on Timer 3 (which is on PC6)
     set(TCCR3A, COM3A1);// Non-inverting mode for OC3A so the output starts high
     clear(TCCR3A, COM3A0);// Ensure COM3A0 is cleared
 
@@ -32,7 +32,7 @@ int main(void)
     set(TCCR3B, WGM32);// set the waveform generation mode on fast PWM  
     set(TCCR3B, WGM33);// set waveform generation mode on fast PWM with ICR3 as top
 
- // Set prescaler to 1 for maximum PWM frequency to prevent flicker (I had this problem with my earlier code that it would flicker) (see 1.4.2) but changed that for this final code
+    // Set prescaler to 1 for maximum PWM frequency to prevent flicker (I had this problem with my earlier code that it would flicker) (see 1.4.2) but changed that for this final code
     set(TCCR3B, CS30); // turns on bit CS30
     clear(TCCR3B, CS31); // Turns of bit CS31
     clear(TCCR3B, CS32); // Turns off CS32 thus making sure the timer runs at full clock speed
@@ -61,7 +61,7 @@ int main(void)
 }
 
 // Function to control the LED pulse with variable intensities and durations
-void pulsefunction(int max_intensity, int increase_ms, int decrease_ms) {
+void pulsefunc(int max_intensity, int increase_ms, int decrease_ms) {
     int i; // set variable i that will be used in for loop
     int duty_cycle; // set the inensity level of the LED as it pulses
     int steps = STEPS; // the maount of steps being used to gradually decrease the LED
@@ -96,9 +96,9 @@ void pulsefunction(int max_intensity, int increase_ms, int decrease_ms) {
 // Function for heartbeat pattern with variable maximum intensity
 void heartbeat(int max_intensity) {
     // First pulse: Increase to max_intensity over 100 ms, then decrease to 0% over 400 ms
-    pulsefunction(max_intensity, 100, 400);//First hard pulse
+    pulsefunc(max_intensity, 100, 400);//First hard pulse
     // Short pause between pulses
     _delay_ms(100);// Delay of 100 ms
     // Second pulse: Increase to half of max_intensity over 100 ms, then decrease to 0% over 400 ms
-    pulsefunction(max_intensity / 2, 100, 400);  // Second "dub" pulse
+    pulsefunc(max_intensity / 2, 100, 400);  // Second "dub" pulse
 }
