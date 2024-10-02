@@ -2,7 +2,7 @@
  * Author: Steyn Knollema
  * Description: Heartbeat that slowly fades out
  * Copyright: I dont care if you copy it
- * Used ChatGPT as a helper
+ * Used ChatGPT as a debugger
  */
 
 #include "MEAM_general.h"  
