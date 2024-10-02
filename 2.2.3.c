@@ -1,6 +1,6 @@
 /* Name: main.c
  * Author: Steyn Knollema
- * Description: Heartbeat that slowly fades out
+ * Description: 2.2.3
  * Copyright: I dont care if you copy it
  * Used ChatGPT as a debugger
  */
